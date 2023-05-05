@@ -14,6 +14,6 @@ module.exports = {
     const row = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(button)
 
-    await interaction.channel!.send({ content: `Ouvrez un ticket pour toute **plainte à l'encontre d'un joueur** <:NAN:1103277577948364944>`, components: [row] })
+    await interaction.channel!.send({ content: 'Ouvrez un ticket pour toute **plainte à l\'encontre d\'un joueur** <:NAN:1103277577948364944>', components: [row] })
   }
 }
