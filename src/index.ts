@@ -5,7 +5,7 @@ import { Client, Collection, Events, GatewayIntentBits } from 'discord.js'
 
 config()
 
-const client = new Client({
+const client: any = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.MessageContent,
