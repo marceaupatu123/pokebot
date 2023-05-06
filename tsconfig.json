@@ -1,6 +1,6 @@
 {
-  "compilerOptions": {
-      "target": "ES2017",
+    "compilerOptions": {
+      "target": "ESNext",
       "module": "commonjs",
       "rootDir": "./src/",
       "outDir": "./dist/",
@@ -8,6 +8,7 @@
       "moduleResolution": "node",
       "importHelpers": true,
       "experimentalDecorators": true,
+      "noEmitOnError": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "allowSyntheticDefaultImports": true,
@@ -15,19 +16,18 @@
       "forceConsistentCasingInFileNames": true,
       "removeComments": true,
       "typeRoots": [
-          "node_modules/@types"
+        "node_modules/@types"
       ],
       "sourceMap": false,
       "baseUrl": "./"
-  },
-  "files": [
-      "src/index.ts"
-  ],
-  "include": [
-      "./**/*.ts"
-, "deploy-commands.js"  ],
-  "exclude": [
+    },
+    "include": [
+      "./src/**/*.ts",
+      "deploy-commands.js"
+    ],
+    "exclude": [
       "node_modules",
       "dist"
-  ],
-} 
+    ]
+  }
+  

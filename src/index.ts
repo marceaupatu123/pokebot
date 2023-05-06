@@ -1,7 +1,7 @@
 import { config } from 'dotenv'
-import fs from 'fs'
-import path from 'path'
+import * as fs from 'fs'
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js'
+const path = require('path')
 
 config()
 
