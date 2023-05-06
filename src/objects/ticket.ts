@@ -38,7 +38,7 @@ export default class Ticket {
       .setColor('#cbbfa8')
       // eslint-disable-next-line @typescript-eslint/no-base-to-string
       .setDescription(`Bienvenu dans ton ticket ${member.toString()}!\n Merci de nous faire confiance pour régler ton problème, un membre de nos équipes va venir t'aider à résoudre ton problème.\nSi tu as simplement des questions nous t'invitons à favoriser le salon ${salonQuestion.toString()} et fermer ce ticket.`)
-      .addFields({ name: '📜 Instructions', value: '➡️ Décris ta situation clairement à la suite de ce message, plus tu sera détaillé dans ta description et plus le processus sera rapide et efficace.\n➡️ Soit respectueux dans ta demande ! Prend ton mal en patience et ne te montre pas agressif.\n➡️ Répond dans les dernière 24h suivant une réponse du staff, auquel cas ton ticket sera automatiquement fermé.' })
+      .addFields({ name: '<:Candidature:1104411389361147985> Instructions', value: '➡️ Décris ta situation clairement à la suite de ce message, plus tu sera détaillé dans ta description et plus le processus sera rapide et efficace.\n➡️ Soit respectueux dans ta demande ! Prend ton mal en patience et ne te montre pas agressif.\n➡️ Répond dans les dernière 24h suivant une réponse du staff, auquel cas ton ticket sera automatiquement fermé.' })
     await thread.send({ embeds: [embed] })
     return new Ticket(member, type, thread, id)
   }
