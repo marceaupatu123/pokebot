@@ -19,7 +19,7 @@ client.commands = new Collection()
 const commandsPath = path.join(__dirname, 'commands')
 const commandFiles = fs
   .readdirSync(commandsPath)
-  .filter((file: string) => file.endsWith('.ts'))
+  .filter((file: string) => file.endsWith('.ts') || file.endsWith('.js'))
 
 commandFiles.forEach((file: string) => {
   const filePath = path.join(commandsPath, file)
@@ -40,7 +40,7 @@ commandFiles.forEach((file: string) => {
 const eventsPath = path.join(__dirname, 'events')
 const eventFiles = fs
   .readdirSync(eventsPath)
-  .filter((file: string) => file.endsWith('.ts'))
+  .filter((file: string) => file.endsWith('.ts') || file.endsWith('.js'))
 
 eventFiles.forEach((file: string) => {
   const filePath = path.join(eventsPath, file)
