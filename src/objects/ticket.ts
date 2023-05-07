@@ -32,7 +32,7 @@ export default class Ticket {
     })
     await thread.members.add(member, 'Créateur du ticket')
     const salonQuestion = this.guild.channels.cache.get(process.env.salonQuestionId!)
-    if (typeof salonQuestion === 'undefined' || !(salonQuestion instanceof ForumChannel)) throw new Error('salonQuestion not found!')
+    if (!(salonQuestion instanceof ForumChannel)) throw new Error('salonQuestion not found!')
     const embed = new EmbedBuilder()
       .setThumbnail('https://media.discordapp.net/attachments/1102989329879531624/1104382930362585179/2Q-removebg-preview.png?width=105&height=86')
       .setColor('#cbbfa8')

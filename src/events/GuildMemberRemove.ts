@@ -5,18 +5,40 @@ module.exports = {
   name: Events.GuildMemberRemove,
   once: false,
   async execute (member: GuildMember) {
-    const fetchedLogs = await member.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberKick })
-    const kickLog = fetchedLogs.entries.first()
-    if (typeof kickLog === 'undefined' || member.joinedAt === null) return
-    if (kickLog?.createdAt < member.joinedAt) return
+    const fetchedKickLogs = await member.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberKick })
+    const fetchedBanLogs = await member.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanAdd })
+    const kickLog = fetchedKickLogs.entries.first()
+    const banLog = fetchedBanLogs.entries.first()
     const logChannel = member.guild.channels.cache.get(process.env.salonLogId!)
     if (!(logChannel instanceof TextChannel)) return
     const avatarURL = member.displayAvatarURL()
-    const embed = new EmbedBuilder()
-      .setDescription(`L'utilisateur ${member.toString()} à été expulsé par ${kickLog.executor?.toString() ?? 'N/A'} pour la raison suivante : \`\`\`${kickLog.reason ?? 'N/A'} \`\`\``)
-      .setThumbnail(avatarURL)
-      .setColor('Blue')
-      .setFooter(footer)
-    await logChannel.send({ embeds: [embed] })
+    if (!(typeof banLog === 'undefined' || member.joinedAt === null)) {
+      if (banLog?.createdAt < member.joinedAt) return
+      if (!(logChannel instanceof TextChannel)) return
+      const embed = new EmbedBuilder()
+        .setDescription(`L'utilisateur ${member.toString()} à été banni par ${banLog.executor?.toString() ?? 'N/A'} pour la raison suivante : \`\`\`${banLog.reason ?? 'N/A'} \`\`\``)
+        .setThumbnail(avatarURL)
+        .setColor('Red')
+        .setFooter(footer)
+      await logChannel.send({ embeds: [embed] })
+    }
+    if (!(typeof kickLog === 'undefined' || member.joinedAt === null)) {
+      if (kickLog?.createdAt < member.joinedAt) return
+      const embed = new EmbedBuilder()
+        .setDescription(`L'utilisateur ${member.toString()} à été expulsé par ${kickLog.executor?.toString() ?? 'N/A'} pour la raison suivante : \`\`\`${kickLog.reason ?? 'N/A'} \`\`\``)
+        .setThumbnail(avatarURL)
+        .setColor('Orange')
+        .setFooter(footer)
+      await logChannel.send({ embeds: [embed] })
+    }
+    if (!(typeof kickLog === 'undefined' || member.joinedAt === null)) {
+      if (kickLog?.createdAt < member.joinedAt) return
+      const embed = new EmbedBuilder()
+        .setDescription(`L'utilisateur ${member.toString()} à été expulsé par ${kickLog.executor?.toString() ?? 'N/A'} pour la raison suivante : \`\`\`${kickLog.reason ?? 'N/A'} \`\`\``)
+        .setThumbnail(avatarURL)
+        .setColor('Orange')
+        .setFooter(footer)
+      await logChannel.send({ embeds: [embed] })
+    }
   }
 }
