@@ -68,15 +68,22 @@ module.exports = {
     ];
 
     const filteredArray = optionsArray.filter(
-      (n): n is string => typeof n === "string"
+      (n, index): n is string =>
+        typeof n === "string" && optionsArray.indexOf(n) === index
     );
 
+    const filteredArrayWithoutEmoji = filteredArray.map((s: string) =>
+      s.replace(
+        /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+        ""
+      )
+    );
     const initialData = filteredArray.map(() => 0);
     const numberEmojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
 
     const buttons = filteredArray.map((option, index) =>
       new ButtonBuilder()
-        .setCustomId(`${option}${index}`)
+        .setCustomId(`${option}`)
         .setLabel(option)
         .setEmoji(numberEmojis[index])
         .setStyle(ButtonStyle.Primary)
@@ -85,7 +92,7 @@ module.exports = {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
 
     const attachment = new AttachmentBuilder(
-      makeGraph(filteredArray, initialData),
+      makeGraph(filteredArrayWithoutEmoji, initialData),
       { name: "graph.png" }
     );
     const avatar =
@@ -116,12 +123,13 @@ module.exports = {
     const votes = [...initialData];
 
     collector.on("collect", async (interaction) => {
-      const index = optionsArray.indexOf(interaction.customId);
+      await interaction.deferReply({ ephemeral: true });
+      const index = filteredArray.indexOf(interaction.customId);
       if (index === -1) return;
 
       // Si le membre a déjà voté, retire son vote précédent
       if (voteData.has(interaction.member)) {
-        const previousIndex = optionsArray.indexOf(
+        const previousIndex = filteredArray.indexOf(
           voteData.get(interaction.member)
         );
         if (previousIndex !== -1) {
@@ -135,12 +143,11 @@ module.exports = {
 
       // Met à jour le graphique et envoie une réponse à l'utilisateur
       const updatedAttachment = new AttachmentBuilder(
-        makeGraph(filteredArray, votes),
+        makeGraph(filteredArrayWithoutEmoji, votes),
         { name: "graph.png" }
       );
-      await interaction.reply({
+      await interaction.editReply({
         content: "Vote comptabilisé 🫡",
-        ephemeral: true,
       });
 
       await message.edit({
