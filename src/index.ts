@@ -1,83 +1,85 @@
-import { config } from 'dotenv'
-import * as fs from 'fs'
-import { Client, Collection, Events, GatewayIntentBits } from 'discord.js'
-const path = require('path')
+import { config } from "dotenv";
+import * as fs from "fs";
+import { Client, Collection, Events, GatewayIntentBits } from "discord.js";
+const path = require("path");
 
-config()
+config();
 
 const client: any = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMembers
-  ]
-})
+    GatewayIntentBits.GuildMembers,
+  ],
+});
 
-client.commands = new Collection()
+client.commands = new Collection();
 
-const commandsPath = path.join(__dirname, 'commands')
+const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
   .readdirSync(commandsPath)
-  .filter((file: string) => file.endsWith('.ts') || file.endsWith('.js'))
+  .filter((file: string) => file.endsWith(".ts") || file.endsWith(".js"));
 
 commandFiles.forEach((file: string) => {
-  const filePath = path.join(commandsPath, file)
-  const command = require(filePath)
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
 
   if (
-    Object.prototype.hasOwnProperty.call(command, 'data') &&
-    Object.prototype.hasOwnProperty.call(command, 'execute')
+    Object.prototype.hasOwnProperty.call(command, "data") &&
+    Object.prototype.hasOwnProperty.call(command, "execute")
   ) {
-    client.commands.set(command.data.name, command)
+    client.commands.set(command.data.name, command);
   } else {
     console.log(
       `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-    )
+    );
   }
-})
+});
 
-const eventsPath = path.join(__dirname, 'events')
+const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs
   .readdirSync(eventsPath)
-  .filter((file: string) => file.endsWith('.ts') || file.endsWith('.js'))
+  .filter((file: string) => file.endsWith(".ts") || file.endsWith(".js"));
 
 eventFiles.forEach((file: string) => {
-  const filePath = path.join(eventsPath, file)
-  const event = require(filePath)
+  const filePath = path.join(eventsPath, file);
+  const event = require(filePath);
   try {
-    if (Object.prototype.hasOwnProperty.call(event, 'once') && event.once) {
-      client.once(event.name, (...args: any) => event.execute(...args))
+    if (Object.prototype.hasOwnProperty.call(event, "once") && event.once) {
+      client.once(event.name, (...args: any) => event.execute(...args));
     } else {
-      client.on(event.name, (...args: any) => event.execute(...args))
+      client.on(event.name, (...args: any) => event.execute(...args));
     }
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-})
+});
 
 client.on(Events.InteractionCreate, async (interaction: any) => {
   if (
     !interaction.isChatInputCommand() &&
     !interaction.isUserContextMenuCommand()
-  ) { return }
+  ) {
+    return;
+  }
 
-  const command = interaction.client.commands.get(interaction.commandName)
+  const command = interaction.client.commands.get(interaction.commandName);
 
   if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`)
-    return
+    console.error(`No command matching ${interaction.commandName} was found.`);
+    return;
   }
 
   try {
-    await command.execute(interaction)
+    await command.execute(interaction);
   } catch (error) {
-    console.error(error)
+    console.error(error);
     await interaction.reply({
-      content: 'There was an error while executing this command!',
-      ephemeral: true
-    })
+      content: "There was an error while executing this command!",
+      ephemeral: true,
+    });
   }
-})
+});
 
-client.login(process.env.botToken)
+client.login(process.env.botToken);

@@ -1,24 +1,153 @@
-import { SlashCommandBuilder, BaseGuildTextChannel, type BaseInteraction, ChatInputCommandInteraction, type Message, AttachmentBuilder, EmbedBuilder } from 'discord.js'
-import { commandDone } from '../messages.json'
-import makeGraph from '../objects/graph'
+import {
+  SlashCommandBuilder,
+  BaseGuildTextChannel,
+  type BaseInteraction,
+  ChatInputCommandInteraction,
+  AttachmentBuilder,
+  EmbedBuilder,
+  ButtonBuilder,
+  ActionRowBuilder,
+  ButtonStyle,
+  ComponentType,
+} from "discord.js";
+import { footer, commandDone } from "../messages.json";
+import makeGraph from "../objects/graph";
+
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('poll')
-    .setDescription('Fais un sondage'),
-  async execute (interaction: BaseInteraction) {
-    if (!(interaction instanceof ChatInputCommandInteraction)) return
-    // Delete the specified number of messages
-    const channel = interaction.channel
-    if (!(channel instanceof BaseGuildTextChannel)) return
-    await interaction.reply('Veuillez écrire toute vos options dans ce format *option1/option2/...*\n Ne mettez pas plus de 5 options')
-    const filter = (m: Message): boolean => m.author === interaction.user
-    const collector = channel.createMessageCollector({ filter, max: 1, time: 10000 })
-    collector.on('collect', async (m) => {
-      const attachment = new AttachmentBuilder(makeGraph(m.content.split('/'), [23, 34, 103]), { name: 'graph.png' })
-      const embed = new EmbedBuilder()
-        .setImage('attachment://graph.png')
-        .setColor('#0c3e89')
-      await interaction.editReply({ content: commandDone, files: [attachment], embeds: [embed] })
-    })
-  }
-}
+    .setName("poll")
+    .setDescription("Fais un sondage")
+    .addStringOption((option) =>
+      option
+        .setName("titre")
+        .setRequired(true)
+        .setDescription("Titre du sondage")
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option1")
+        .setRequired(true)
+        .setDescription("Première Option")
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option2")
+        .setRequired(true)
+        .setDescription("Deuxième Option")
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option3")
+        .setRequired(false)
+        .setDescription("Troisième Option")
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option4")
+        .setRequired(false)
+        .setDescription("Quatrième Option")
+    )
+    .addStringOption((option) =>
+      option
+        .setName("option5")
+        .setRequired(false)
+        .setDescription("Cinquième Option")
+    ),
+
+  async execute(interaction: BaseInteraction) {
+    if (!(interaction instanceof ChatInputCommandInteraction)) return;
+    const channel = interaction.channel;
+    if (!(channel instanceof BaseGuildTextChannel)) return;
+    await interaction.deferReply({ ephemeral: true });
+    const optionsArray = [
+      interaction.options.getString("option1"),
+      interaction.options.getString("option2"),
+      interaction.options.getString("option3"),
+      interaction.options.getString("option4"),
+      interaction.options.getString("option5"),
+    ];
+
+    const filteredArray = optionsArray.filter(
+      (n): n is string => typeof n === "string"
+    );
+
+    const initialData = filteredArray.map(() => 0);
+    const numberEmojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
+
+    const buttons = filteredArray.map((option, index) =>
+      new ButtonBuilder()
+        .setCustomId(`${option}${index}`)
+        .setLabel(option)
+        .setEmoji(numberEmojis[index])
+        .setStyle(ButtonStyle.Primary)
+    );
+
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
+
+    const attachment = new AttachmentBuilder(
+      makeGraph(filteredArray, initialData),
+      { name: "graph.png" }
+    );
+    const avatar =
+      interaction.member.displayAvatarURL() ??
+      "https://cdn5.vectorstock.com/i/1000x1000/41/14/flat-design-hand-holding-survey-test-paper-vector-7724114.jpg";
+    const embed = new EmbedBuilder()
+      .setImage("attachment://graph.png")
+      .setColor("#0c3e89")
+      .setFooter(footer)
+      .setAuthor({
+        name: interaction.member.displayName,
+        iconURL: avatar,
+      })
+      .setTitle(`Sondage : ${interaction.options.getString("titre")!} 📊`);
+
+    const message = await interaction.channel!.send({
+      files: [attachment],
+      embeds: [embed],
+      components: [row],
+    });
+    await interaction.editReply({ content: commandDone });
+
+    const collector = message.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+    });
+
+    const voteData = new Map();
+    const votes = [...initialData];
+
+    collector.on("collect", async (interaction) => {
+      const index = optionsArray.indexOf(interaction.customId);
+      if (index === -1) return;
+
+      // Si le membre a déjà voté, retire son vote précédent
+      if (voteData.has(interaction.member)) {
+        const previousIndex = optionsArray.indexOf(
+          voteData.get(interaction.member)
+        );
+        if (previousIndex !== -1) {
+          votes[previousIndex]--;
+        }
+      }
+
+      // Met à jour le tableau des votes et le tableau des membres qui ont voté
+      votes[index]++;
+      voteData.set(interaction.member, interaction.customId);
+
+      // Met à jour le graphique et envoie une réponse à l'utilisateur
+      const updatedAttachment = new AttachmentBuilder(
+        makeGraph(filteredArray, votes),
+        { name: "graph.png" }
+      );
+      await interaction.reply({
+        content: "Vote comptabilisé 🫡",
+        ephemeral: true,
+      });
+
+      await message.edit({
+        embeds: [embed],
+        files: [updatedAttachment],
+        components: [row],
+      });
+    });
+  },
+};
