@@ -6,8 +6,8 @@ module.exports = {
     .setDescription('Wow'),
   async execute (interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()
-      .setImage('https://media.discordapp.net/attachments/608267030553952266/833423982606417951/regles.png?width=1060&height=177')
-      .setColor('#0c3e89')
+      .setImage('https://cdn.discordapp.com/attachments/1103004857289416754/1104812719409999923/Capture_decran_2023-05-07_184954.png')
+      .setColor('#6cc354')
     const embed2 = new EmbedBuilder()
       .setTitle('📋 Il est interdit de ...')
       .setDescription(`
@@ -26,7 +26,7 @@ module.exports = {
       > 13・Publier des informations personnelles.
       > 14・Créer des comptes alternatifs/doubles.`)
       .setFooter({ text: 'Dominus_Marceau#8457', iconURL: 'https://cdn.discordapp.com/avatars/284036155928870912/f47336d8ca45a1b69d55420dd88c6bd4.webp?size=160' })
-      .setColor('#0c3e89')
+      .setColor('#6cc354')
     await interaction.channel?.send({ embeds: [embed, embed2] })
   }
 }

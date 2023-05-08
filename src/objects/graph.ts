@@ -27,7 +27,8 @@ export default function makeGraph (label: string[], dataArray: number[]): Buffer
             boxWidth: 60,
             font: {
               size: 30
-            }
+            },
+            color: '#98fb98'
           }
         }
       }

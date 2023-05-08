@@ -1,4 +1,4 @@
-import { AuditLogEvent, Events, TextChannel, type GuildMember, EmbedBuilder } from 'discord.js'
+import { AuditLogEvent, Events, TextChannel, type GuildMember, EmbedBuilder, Role } from 'discord.js'
 import { footer } from '../messages.json'
 module.exports = {
   name: Events.GuildMemberUpdate,
@@ -6,7 +6,9 @@ module.exports = {
   async execute (oldMember: GuildMember, newMember: GuildMember) {
     if (oldMember.pending && !newMember.pending) {
       const memberRole = oldMember.guild.roles.cache.get(process.env.roleMemberId!)
+      const memberRole2 = oldMember.guild.roles.cache.get('284036155928870912')
       if (typeof memberRole === 'undefined') throw new Error('memberRole not found!')
+      if (memberRole2 instanceof Role) await newMember.roles.add(memberRole2)
       await newMember.roles.add(memberRole)
     }
     const fetchedMemberUpdateLogs = await newMember.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberUpdate })
