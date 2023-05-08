@@ -106,7 +106,7 @@ module.exports = {
         name: interaction.member.displayName,
         iconURL: avatar,
       })
-      .setTitle(`Sondage : ${interaction.options.getString("titre")!} 📊`);
+      .setTitle(`Sondage 📊 ${interaction.options.getString("titre")!}`);
 
     const message = await interaction.channel!.send({
       files: [attachment],
@@ -151,7 +151,11 @@ module.exports = {
       });
 
       await message.edit({
-        embeds: [embed],
+        embeds: [
+          EmbedBuilder.from(embed).setDescription(
+            `**Nombre de votants:** ${voteData.size}`
+          ),
+        ],
         files: [updatedAttachment],
         components: [row],
       });
