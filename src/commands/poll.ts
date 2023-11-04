@@ -153,7 +153,7 @@ module.exports = {
       await message.edit({
         embeds: [
           EmbedBuilder.from(embed).setDescription(
-            `**Nombre de votants:** ${voteData.size}`
+            `**Nombre de votants total:** ${voteData.size}`
           ),
         ],
         files: [updatedAttachment],
