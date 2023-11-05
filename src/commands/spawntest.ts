@@ -49,7 +49,7 @@ module.exports = {
       selectMenu
     );
     await interaction.channel?.send({
-      content: "Prend la couleur de ton choix !",
+      content: "Prends la couleur de ton choix !",
       components: [row],
     });
   },
